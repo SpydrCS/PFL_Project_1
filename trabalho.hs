@@ -48,8 +48,9 @@ tplToString xs = [(show a) ++ "*" ++ [b] ++ "^" ++ (show c) | (a,b,c) <- xs, a >
 joiner :: [String] -> String -- joins list of strings into one string
 joiner xs = foldr (\a b-> a ++ if b=="" then b else if (head b)=='-' then " - " ++ (drop 1 b) else " + " ++ b) "" xs
 
-derive :: [(Int, Char, Int)] -> [(Int, Char, Int)]
-derive xs = [(a*c,b,c-1) | (a,b,c) <- xs, c > 1] ++ [(a,' ',0) | (a,b,c) <- xs, c == 1]
+derive :: [(Int, Char, Int)] -> Char -> [(Int, Char, Int)]
+derive xs car = [(a*c,b,c-1) | (a,b,c) <- xs, c > 1, b == car] ++ [(a,' ',0) | (a,b,c) <- xs, c == 1, b == car] ++
+ [(a,b,c) | (a,b,c) <- xs, c > 1, b /= car] ++ [(a,b,c) | (a,b,c) <- xs, c == 1, b /= car]
 
 normalize :: String -> String -- main function to run option a
 normalize poly = joiner (tplToString (moreSimple (simply (sorting (internalRepresentation (polynomialOrganizer poly))))))
@@ -60,5 +61,5 @@ add poly1 poly2 = joiner (tplToString (moreSimple (simply (sorting (internalRepr
 -- multiply :: String -> String -> String
 -- multiply poly1 poly2 =
 
-derivative :: String -> String -- main function to run option d
-derivative poly = joiner (tplToString (moreSimple (simply (sorting (derive (moreSimple (simply (sorting (internalRepresentation (polynomialOrganizer poly))))))))))
+derivative :: String -> Char -> String -- main function to run option d
+derivative poly car = joiner (tplToString (moreSimple (simply (sorting (derive (moreSimple (simply (sorting (internalRepresentation (polynomialOrganizer poly))))) car)))))
