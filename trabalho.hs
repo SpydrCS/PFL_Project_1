@@ -1,6 +1,7 @@
-import Data.Char ( isDigit, isAlpha )
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Use :" #-}
+import Data.Char ( isDigit, isAlpha, isLetter )
 import qualified Data.Map as M
-
 polynomialCleaner :: String -> String
 polynomialCleaner [] = []
 polynomialCleaner (x:xs)
@@ -21,18 +22,29 @@ maybeTail :: [Char] -> String
 maybeTail [] = "1"
 maybeTail xs = tail xs
 
-internalRepresentation :: [String] -> [(Int,Char ,Int)]
-internalRepresentation xs
-    |null xs = []
-    |all isDigit (head xs) = (read (head xs), ' ', 0) : internalRepresentation (tail xs)
-    |head (head xs) == '0' = internalRepresentation (drop 1 xs)
-    |isAlpha (head (head xs)) = (1, head (dropWhile isDigit (head xs)), exponent) : internalRepresentation (drop 1 xs)
-    |isAlpha ((head xs)!!1) && head (head xs) == '-' = [(-1, (head xs)!!1, exponent)]
-    |head (head xs) == '-' = (-read (takeWhile isDigit (pos_mon)) :: Int, head (dropWhile isDigit (pos_mon)), exponent) : internalRepresentation (drop 1 xs)
-    |otherwise = (read (takeWhile isDigit (head xs)) :: Int, head (dropWhile isDigit (head xs)), exponent) : internalRepresentation (drop 1 xs)
-    where pos_mon = tail (head xs)
-          exponent  = read (maybeTail (dropWhile (/= '^') (head xs))) :: Int
+exponentProcessor :: String -> [(Char, Int)]
+exponentProcessor [] = []
+exponentProcessor (x:xs)
+    |  not (null xs) && isDigit (head xs) = (x, read (takeWhile isDigit xs)) : exponentProcessor (dropWhile isDigit xs)
+    | otherwise = (x, 1) : exponentProcessor xs
 
+internalRepresentation :: String -> (Int,[(Char,Int)])
+internalRepresentation xs
+    | all isDigit xs = (read xs, [])
+    | head xs == '-' && all isDigit (tail xs) = (-read (tail xs), [])
+    | all isLetter xs = (1, [(char,1)| char <- xs])
+    | head xs == '-' && all isLetter (tail xs) = (-1, [(char,1)| char <- tail xs])
+    | head xs == '-' && not (isDigit (xs !! 2)) = (-1, [tuples | tuples <- exponentProcessor (filter (/='^') (dropWhile isDigit xs))])
+    | head xs == '-' = (-digit, [tuples | tuples <- exponentProcessor (filter (/='^') (dropWhile isDigit xs))])
+    |not (isDigit (head xs)) = (1, [tuples | tuples <- exponentProcessor (filter (/='^') (dropWhile isDigit xs))])
+    |otherwise = (digit, [tuples | tuples <- exponentProcessor (filter (/='^') (dropWhile isDigit xs))])
+    where
+        digit = read (takeWhile isDigit xs) :: Int
+        negDigit = - read (tail (takeWhile isDigit xs)) :: Int
+
+iR :: String -> [(Int,[(Char,Int)])]
+iR xs = [internalRepresentation x | x <- polynomialOrganizer xs]
+{-
 sorting :: [(Int,Char,Int)] -> [((Char,Int),[Int])]  -- takes the list with all variables (some repeated) and groups them without repetition
 sorting assocs = M.toList (M.fromListWith (\n1 n2 -> [sum(n1 ++ n2)]) [((b,c), [a]) | (a,b,c) <- assocs]) -- [(1,'y',1),(2,'y',1)] becomes [(('y',1),[3])], etc
 
@@ -62,3 +74,4 @@ add poly1 poly2 = joiner (tplToString (moreSimple (simply (sorting (internalRepr
 
 derivative :: String -> Char -> String -- main function to run option d
 derivative poly car = joiner (tplToString (moreSimple (simply (sorting (derive (moreSimple (simply (sorting (internalRepresentation (polynomialOrganizer poly))))) car)))))
+-}
