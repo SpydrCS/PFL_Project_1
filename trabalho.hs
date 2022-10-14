@@ -42,7 +42,7 @@ internalRepresentation xs
         digit = read (takeWhile isDigit xs) :: Int
         negDigit = - read (tail (takeWhile isDigit xs)) :: Int
 
-iR :: String -> [(Int,[(Char,Int)])]
+iR :: String -> [(Int,[(Char,Int)])] -- Internal Representation of the polynomial e.g (2,[(x,2),(y,1)]) = x^2y
 iR xs = [internalRepresentation x | x <- polynomialOrganizer xs]
 {-
 sorting :: [(Int,Char,Int)] -> [((Char,Int),[Int])]  -- takes the list with all variables (some repeated) and groups them without repetition
