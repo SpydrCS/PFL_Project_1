@@ -49,8 +49,7 @@ joiner :: [String] -> String -- joins list of strings into one string
 joiner xs = foldr (\a b-> a ++ if b=="" then b else if (head b)=='-' then " - " ++ (drop 1 b) else " + " ++ b) "" xs
 
 derive :: [(Int, Char, Int)] -> Char -> [(Int, Char, Int)]
-derive xs car = [(a*c,b,c-1) | (a,b,c) <- xs, c > 1, b == car] ++ [(a,' ',0) | (a,b,c) <- xs, c == 1, b == car] ++
- [(a,b,c) | (a,b,c) <- xs, c > 1, b /= car] ++ [(a,b,c) | (a,b,c) <- xs, c == 1, b /= car]
+derive xs car = [(a*c,b,c-1) | (a,b,c) <- xs, c > 1, b == car] ++ [(a,' ',0) | (a,b,c) <- xs, c == 1, b == car] 
 
 normalize :: String -> String -- main function to run option a
 normalize poly = joiner (tplToString (moreSimple (simply (sorting (internalRepresentation (polynomialOrganizer poly))))))
