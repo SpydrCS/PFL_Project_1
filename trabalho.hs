@@ -34,13 +34,13 @@ internalRepresentation xs
     | head xs == '-' && all isDigit (tail xs) = (-read (tail xs), [])
     | all isLetter xs = (1, [(char,1)| char <- xs])
     | head xs == '-' && all isLetter (tail xs) = (-1, [(char,1)| char <- tail xs])
-    | head xs == '-' && not (isDigit (xs !! 2)) = (-1, [tuples | tuples <- exponentProcessor (filter (/='^') (dropWhile isDigit xs))])
-    | head xs == '-' = (-digit, [tuples | tuples <- exponentProcessor (filter (/='^') (dropWhile isDigit xs))])
+    | head xs == '-' && not (isDigit (xs !! 1)) = (-1, [tuples | tuples <- exponentProcessor (filter (/='^') (tail xs))])
+    | head xs == '-' = (negDigit, [tuples | tuples <- exponentProcessor (filter (/='^') (dropWhile isDigit(tail xs)))])
     |not (isDigit (head xs)) = (1, [tuples | tuples <- exponentProcessor (filter (/='^') (dropWhile isDigit xs))])
     |otherwise = (digit, [tuples | tuples <- exponentProcessor (filter (/='^') (dropWhile isDigit xs))])
     where
         digit = read (takeWhile isDigit xs) :: Int
-        negDigit = - read (tail (takeWhile isDigit xs)) :: Int
+        negDigit = - read (takeWhile isDigit (tail xs)) :: Int
 
 iR :: String -> [(Int,[(Char,Int)])] -- Internal Representation of the polynomial e.g (2,[(x,2),(y,1)]) = x^2y
 iR xs = [internalRepresentation x | x <- polynomialOrganizer xs]
