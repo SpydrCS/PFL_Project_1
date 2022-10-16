@@ -42,26 +42,45 @@ internalRepresentation xs
         digit = read (takeWhile isDigit xs) :: Int
         negDigit = - read (takeWhile isDigit (tail xs)) :: Int
 
-iR :: String -> [(Int,[(Char,Int)])] -- Internal Representation of the polynomial e.g (2,[(x,2),(y,1)]) = x^2y
-iR xs = [internalRepresentation x | x <- polynomialOrganizer xs]
+sorting :: [(Int,[(Char,Int)])] -> [([(Char,Int)],[Int])]  -- takes the list with all variables (some repeated) and groups them without repetition
+sorting assocs = M.toList (M.fromListWith (\n1 n2 -> [sum(n1 ++ n2)]) [((b), [a]) | (a,b) <- assocs]) -- [(1,'y',1),(2,'y',1)] becomes [(('y',1),[3])], etc
+
+simply :: [([(Char,Int)],[Int])] -> [([(Char,Int)],Int)] -- changes count number from list to normal int
+simply xs = [(a,b) | ((a,[b])) <- xs]
+
+simplifyVariables :: [(Char,Int)] -> [String] -- simplifies internal representation of variables e.g [('x',2),('y',1)] = ["x^2","y"]
+simplifyVariables xs = [[a] ++ "^" ++ (show b) | (a,b) <- xs, b > 1] ++ [[a] | (a,b) <- xs, b == 1]
+
+joinVariables :: [String] -> String -- simplifies internal representation of variables e.g ["x^2","y^1"] = "x^2*y"
+joinVariables xs = foldr (\a b -> a ++ if b == "" then b else "*" ++ b) "" xs
+
+simpVar :: [(Char,Int)] -> String -- from [('x',2),('y',1)] to "x^2*y"
+simpVar xs = joinVariables (simplifyVariables xs)
+
+tplToString :: [([(Char,Int)],Int)] -> [String]
+tplToString xs = [(show b) ++ "*" ++ (simpVar a) | (a,b) <- xs, b /= 1] ++ [simpVar a | (a,b) <- xs, b == 1]
+
+joiner :: [String] -> String -- joins list of strings into one string
+joiner xs = foldr (\a b-> a ++ if b=="" then b else if (head b)=='-' then " - " ++ (drop 1 b) else " + " ++ b) "" xs
+
+iR :: String -> String -> String -- Internal Representation of the polynomial e.g (2,[(x,2),(y,1)]) = x^2y
+iR xs rs = joiner (tplToString (simply (sorting [internalRepresentation x | x <- polynomialOrganizer (xs ++ "+" ++ rs)])))
+
+normalize :: String -> String -- main function to run option a (normalize polynomial)
+normalize poly = joiner (tplToString (simply (sorting [internalRepresentation x | x <- polynomialOrganizer poly])))
+
+add :: String -> String -> String -- main function to run option b (add 2 polynomials)
+add poly1 poly2 = joiner (tplToString (simply (sorting [internalRepresentation x | x <- polynomialOrganizer (poly1 ++ "+" ++ poly2)])))
+
 {-
-sorting :: [(Int,Char,Int)] -> [((Char,Int),[Int])]  -- takes the list with all variables (some repeated) and groups them without repetition
-sorting assocs = M.toList (M.fromListWith (\n1 n2 -> [sum(n1 ++ n2)]) [((b,c), [a]) | (a,b,c) <- assocs]) -- [(1,'y',1),(2,'y',1)] becomes [(('y',1),[3])], etc
-
-simply :: [((Char,Int),[Int])] -> [((Char,Int),Int)] -- changes count number from list to normal int
-simply xs = [((a,b),c) | ((a,b),[c]) <- xs]
-
 moreSimple :: [((Char,Int),Int)] -> [(Int, Char, Int)] -- changes representation of tuples
 moreSimple xs = [(a,b,c) | ((b,c),a) <- xs]
 
 tplToString :: [(Int, Char, Int)] -> [String] -- joins tuple into understandable list of strings
 tplToString xs = [(show a) ++ "*" ++ [b] ++ "^" ++ (show c) | (a,b,c) <- xs, a > 1, c > 1] ++ [(show a) ++ "*" ++ [b] | (a,b,c) <- xs, a > 1, c == 1] ++ [[b] | (a,b,c) <- xs, a == 1, c == 1] ++ [[b] ++ "^" ++ (show c) | (a,b,c) <- xs, a == 1, c > 1] ++ [show a | (a,b,c) <- xs, b == ' ']
 
-joiner :: [String] -> String -- joins list of strings into one string
-joiner xs = foldr (\a b-> a ++ if b=="" then b else if (head b)=='-' then " - " ++ (drop 1 b) else " + " ++ b) "" xs
-
 derive :: [(Int, Char, Int)] -> Char -> [(Int, Char, Int)]
-derive xs car = [(a*c,b,c-1) | (a,b,c) <- xs, c > 1, b == car] ++ [(a,' ',0) | (a,b,c) <- xs, c == 1, b == car] 
+derive xs car = [(a*c,b,c-1) | (a,b,c) <- xs, c > 1, b == car] ++ [(a,' ',0) | (a,b,c) <- xs, c == 1, b == car]
 
 normalize :: String -> String -- main function to run option a
 normalize poly = joiner (tplToString (moreSimple (simply (sorting (internalRepresentation (polynomialOrganizer poly))))))
