@@ -58,7 +58,7 @@ simpVar :: [(Char,Int)] -> String -- from [('x',2),('y',1)] to "x^2*y"
 simpVar xs = joinVariables (simplifyVariables xs)
 
 tplToString :: [([(Char,Int)],Int)] -> [String]
-tplToString xs = [(show b) ++ "*" ++ (simpVar a) | (a,b) <- xs, b /= 1] ++ [simpVar a | (a,b) <- xs, b == 1]
+tplToString xs = [(show b) ++ "*" ++ (simpVar a) | (a,b) <- xs, b /= 1, a /= []] ++ [simpVar a | (a,b) <- xs, b == 1, a /= []] ++ [(show b) | (a,b) <- xs, a == []]
 
 joiner :: [String] -> String -- joins list of strings into one string
 joiner xs = foldr (\a b-> a ++ if b=="" then b else if (head b)=='-' then " - " ++ (drop 1 b) else " + " ++ b) "" xs
