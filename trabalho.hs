@@ -20,7 +20,7 @@ polynomialSimplifier (x:xs)
 polynomialOrganizer :: String -> [String]
 polynomialOrganizer xs = polynomialSimplifier (polynomialCleaner xs)
 
-maybeTail :: [Char] -> String
+maybeTail :: [Char] -> String -- in case list is empty, return "1", otherwise return tail of list
 maybeTail [] = "1"
 maybeTail xs = tail xs
 
@@ -75,7 +75,7 @@ normalize poly = joiner (tplToString (simply (sorting [internalRepresentation x 
 add :: String -> String -> String -- main function to run option b (add 2 polynomials)
 add poly1 poly2 = normalize (poly1 ++ "+" ++ poly2)
 
-multiplyVars :: [(Char,Int)] -> [(Char,Int)] -> [(Char,Int)] -- multiplies variables of a 2 monomials 
+multiplyVars :: [(Char,Int)] -> [(Char,Int)] -> [(Char,Int)] -- multiplies variables of a 2 monomials
 multiplyVars x y = x ++ y
 
 multiplyOne :: (Int,[(Char,Int)]) -> (Int,[(Char,Int)]) -> (Int,[(Char,Int)]) -- multiplies two monomials by themselves
@@ -85,14 +85,13 @@ multiply :: [(Int,[(Char,Int)])] -> [(Int,[(Char,Int)])] -> [(Int,[(Char,Int)])]
 multiply [] _ = []
 multiply (x:xs) ys = [multiplyOne x y | y<- ys] ++ multiply xs ys
 
-
 multiplication :: String -> String -> String -- main function to run option c
 multiplication poly1 poly2 = joiner(tplToString (simply (sorting (multiply [internalRepresentation x | x <- polynomialOrganizer poly1] [internalRepresentation x | x <- polynomialOrganizer poly2]))))
 
 reducer :: [(Char,Int)] -> Char -> [(Char,Int)] -- reduces exponent of variable to be derived e.g [('y',1),('x',2)] 'x' = [('y',1),('x',1)]
 reducer xs vari = [(a,b) | (a,b) <- xs, a /= vari] ++ [(a,b-1) | (a,b) <- xs, a==vari, b>1]
 
-maybeHead :: [Int] -> Int
+maybeHead :: [Int] -> Int -- in case list is empty, return "1", otherwise return head of list
 maybeHead [] = 0
 maybeHead xs = head xs
 
