@@ -45,7 +45,8 @@ internalRepresentation xs
         negDigit = - read (takeWhile isDigit (tail xs)) :: Int
 
 sorting :: [(Int,[(Char,Int)])] -> [([(Char,Int)],[Int])]  -- takes the list with all variables (some repeated) and groups them without repetition
-sorting assocs = M.toList (M.fromListWith (\n1 n2 -> [sum(n1 ++ n2)]) [((b), [a]) | (a,b) <- assocs]) -- [(1,'y',1),(2,'y',1)] becomes [(('y',1),[3])], etc
+sorting assocs = M.toList (M.fromListWith (\n1 n2 -> [sum(n1 ++ n2)]) [((b), [a]) | (a,b) <- assocs]) -- [(1,('y',1)),(2,('y',1))] becomes [(('y',1),[3])], etc
+
 
 simply :: [([(Char,Int)],[Int])] -> [([(Char,Int)],Int)] -- changes count number from list to normal int
 simply xs = [(a,b) | ((a,[b])) <- xs]
@@ -53,26 +54,26 @@ simply xs = [(a,b) | ((a,[b])) <- xs]
 simplifyVariables :: [(Char,Int)] -> [String] -- simplifies internal representation of variables e.g [('x',2),('y',1)] = ["x^2","y"]
 simplifyVariables xs = [[a] ++ "^" ++ (show b) | (a,b) <- xs, b > 1] ++ [[a] | (a,b) <- xs, b == 1]
 
-joinVariables :: [String] -> String -- simplifies internal representation of variables e.g ["x^2","y^1"] = "x^2*y"
+joinVariables :: [String] -> String -- simplifies internal representation of variables e.g ["x^2","y"] = "x^2*y"
 joinVariables xs = foldr (\a b -> a ++ if b == "" then b else "*" ++ b) "" xs
 
 simpVar :: [(Char,Int)] -> String -- from [('x',2),('y',1)] to "x^2*y"
 simpVar xs = joinVariables (simplifyVariables xs)
 
-tplToString :: [([(Char,Int)],Int)] -> [String]
+tplToString :: [([(Char,Int)],Int)] -> [String] -- [([(y,1)],1)]
 tplToString xs = [(show b) ++ "*" ++ (simpVar a) | (a,b) <- xs, b /= 1, a /= []] ++ [simpVar a | (a,b) <- xs, b == 1, a /= []] ++ [(show b) | (a,b) <- xs, a == []]
 
 joiner :: [String] -> String -- joins list of strings into one string
 joiner xs = foldr (\a b-> a ++ if b=="" then b else if (head b)=='-' then " - " ++ (drop 1 b) else " + " ++ b) "" xs
 
-iR :: String -> String -> String -- Internal Representation of the polynomial e.g (2,[(x,2),(y,1)]) = x^2y
-iR xs rs = joiner (tplToString (simply (sorting [internalRepresentation x | x <- polynomialOrganizer (xs ++ "+" ++ rs)])))
+iR :: String -> [String] -- Internal Representation of the polynomial e.g (2,[(x,2),(y,1)]) = x^2y
+iR xs = tplToString (simply (sorting [internalRepresentation x | x <- polynomialOrganizer xs]))
 
 normalize :: String -> String -- main function to run option a (normalize polynomial)
 normalize poly = joiner (tplToString (simply (sorting [internalRepresentation x | x <- polynomialOrganizer poly])))
 
 add :: String -> String -> String -- main function to run option b (add 2 polynomials)
-add poly1 poly2 = joiner (tplToString (simply (sorting [internalRepresentation x | x <- polynomialOrganizer (poly1 ++ "+" ++ poly2)])))
+add poly1 poly2 = normalize (poly1 ++ "+" ++ poly2)
 
 multiplyVars :: [(Char,Int)] -> [(Char,Int)] -> [(Char,Int)]
 multiplyVars x y = x ++ y
@@ -87,25 +88,20 @@ multiply (x:xs) ys = [multiplyOne x y | y<- ys] ++ multiply xs ys
 
 multiplication :: String -> String -> String 
 multiplication poly1 poly2 = joiner(tplToString (simply (sorting (multiply [internalRepresentation x | x <- polynomialOrganizer poly1] [internalRepresentation x | x <- polynomialOrganizer poly2]))))
-{-
-moreSimple :: [((Char,Int),Int)] -> [(Int, Char, Int)] -- changes representation of tuples
-moreSimple xs = [(a,b,c) | ((b,c),a) <- xs]
 
-tplToString :: [(Int, Char, Int)] -> [String] -- joins tuple into understandable list of strings
-tplToString xs = [(show a) ++ "*" ++ [b] ++ "^" ++ (show c) | (a,b,c) <- xs, a > 1, c > 1] ++ [(show a) ++ "*" ++ [b] | (a,b,c) <- xs, a > 1, c == 1] ++ [[b] | (a,b,c) <- xs, a == 1, c == 1] ++ [[b] ++ "^" ++ (show c) | (a,b,c) <- xs, a == 1, c > 1] ++ [show a | (a,b,c) <- xs, b == ' ']
+reducer :: [(Char,Int)] -> Char -> [(Char,Int)] -- reduces exponent of variable to be derived e.g [('y',1),('x',2)] 'x' = [('y',1),('x',1)]
+reducer xs vari = [(a,b) | (a,b) <- xs, a /= vari] ++ [(a,b-1) | (a,b) <- xs, a==vari, b>1]
 
-derive :: [(Int, Char, Int)] -> Char -> [(Int, Char, Int)]
-derive xs car = [(a*c,b,c-1) | (a,b,c) <- xs, c > 1, b == car] ++ [(a,' ',0) | (a,b,c) <- xs, c == 1, b == car]
+maybeHead :: [Int] -> Int
+maybeHead [] = 0
+maybeHead xs = head xs
 
-normalize :: String -> String -- main function to run option a
-normalize poly = joiner (tplToString (moreSimple (simply (sorting (internalRepresentation (polynomialOrganizer poly))))))
+coeficient :: [(Char,Int)] -> Char -> Int -- finds coeficient of variable to be derived e.g [('y',1),('x',2)] 'x' = 2
+coeficient xs vari = maybeHead [b | (a,b) <- xs, a==vari]
 
-add :: String -> String -> String -- main function to run option b
-add poly1 poly2 = joiner (tplToString (moreSimple (simply (sorting (internalRepresentation (polynomialOrganizer poly1 ++ polynomialOrganizer poly2))))))
-
--- multiply :: String -> String -> String
--- multiply poly1 poly2 =
+changer :: [(Int,[(Char,Int)])] -> Char -> [(Int,[(Char,Int)])] -- changes internal tuples to be derived by the variable chosen
+changer xs vari = [(a*(coeficient b vari),reducer b vari) | (a,b) <- xs, a*(coeficient b vari)/=0] -- e.g [(1,[('y',1),('x',1)]),(2,[('x',1),('y',2)])] 'y' = [(1,[('x',1)]),(4,[('x',1),('y',1)])]
 
 derivative :: String -> Char -> String -- main function to run option d
-derivative poly car = joiner (tplToString (moreSimple (simply (sorting (derive (moreSimple (simply (sorting (internalRepresentation (polynomialOrganizer poly))))) car)))))
--}
+derivative poly vari | joiner (tplToString (simply (sorting (changer [internalRepresentation x | x <- polynomialOrganizer poly] vari)))) /= "" = joiner (tplToString (simply (sorting (changer [internalRepresentation x | x <- polynomialOrganizer poly] vari))))
+                     | otherwise = "0"
