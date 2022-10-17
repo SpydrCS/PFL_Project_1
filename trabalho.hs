@@ -75,18 +75,18 @@ normalize poly = joiner (tplToString (simply (sorting [internalRepresentation x 
 add :: String -> String -> String -- main function to run option b (add 2 polynomials)
 add poly1 poly2 = normalize (poly1 ++ "+" ++ poly2)
 
-multiplyVars :: [(Char,Int)] -> [(Char,Int)] -> [(Char,Int)]
+multiplyVars :: [(Char,Int)] -> [(Char,Int)] -> [(Char,Int)] -- multiplies variables of a 2 monomials 
 multiplyVars x y = x ++ y
 
-multiplyOne :: (Int,[(Char,Int)]) -> (Int,[(Char,Int)]) -> (Int,[(Char,Int)])
+multiplyOne :: (Int,[(Char,Int)]) -> (Int,[(Char,Int)]) -> (Int,[(Char,Int)]) -- multiplies two monomials by themselves
 multiplyOne (a,b) (c,d) = (a*c, multiplyVars b d)
 
-multiply :: [(Int,[(Char,Int)])] -> [(Int,[(Char,Int)])] -> [(Int,[(Char,Int)])]
+multiply :: [(Int,[(Char,Int)])] -> [(Int,[(Char,Int)])] -> [(Int,[(Char,Int)])] -- multiplies 2 polynomials by one another
 multiply [] _ = []
 multiply (x:xs) ys = [multiplyOne x y | y<- ys] ++ multiply xs ys
 
 
-multiplication :: String -> String -> String 
+multiplication :: String -> String -> String -- main function to run option c
 multiplication poly1 poly2 = joiner(tplToString (simply (sorting (multiply [internalRepresentation x | x <- polynomialOrganizer poly1] [internalRepresentation x | x <- polynomialOrganizer poly2]))))
 
 reducer :: [(Char,Int)] -> Char -> [(Char,Int)] -- reduces exponent of variable to be derived e.g [('y',1),('x',2)] 'x' = [('y',1),('x',1)]
