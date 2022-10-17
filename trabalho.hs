@@ -2,6 +2,8 @@
 {-# HLINT ignore "Use :" #-}
 import Data.Char ( isDigit, isAlpha, isLetter )
 import qualified Data.Map as M
+import Distribution.Verbosity (normal)
+import Control.Monad (when)
 polynomialCleaner :: String -> String
 polynomialCleaner [] = []
 polynomialCleaner (x:xs)
@@ -72,6 +74,19 @@ normalize poly = joiner (tplToString (simply (sorting [internalRepresentation x 
 add :: String -> String -> String -- main function to run option b (add 2 polynomials)
 add poly1 poly2 = joiner (tplToString (simply (sorting [internalRepresentation x | x <- polynomialOrganizer (poly1 ++ "+" ++ poly2)])))
 
+multiplyVars :: [(Char,Int)] -> [(Char,Int)] -> [(Char,Int)]
+multiplyVars x y = x ++ y
+
+multiplyOne :: (Int,[(Char,Int)]) -> (Int,[(Char,Int)]) -> (Int,[(Char,Int)])
+multiplyOne (a,b) (c,d) = (a*c, multiplyVars b d)
+
+multiply :: [(Int,[(Char,Int)])] -> [(Int,[(Char,Int)])] -> [(Int,[(Char,Int)])]
+multiply [] _ = []
+multiply (x:xs) ys = [multiplyOne x y | y<- ys] ++ multiply xs ys
+
+
+multiplication :: String -> String -> String 
+multiplication poly1 poly2 = joiner(tplToString (simply (sorting (multiply [internalRepresentation x | x <- polynomialOrganizer poly1] [internalRepresentation x | x <- polynomialOrganizer poly2]))))
 {-
 moreSimple :: [((Char,Int),Int)] -> [(Int, Char, Int)] -- changes representation of tuples
 moreSimple xs = [(a,b,c) | ((b,c),a) <- xs]
