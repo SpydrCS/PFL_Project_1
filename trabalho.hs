@@ -4,6 +4,10 @@ import Data.Char ( isDigit, isAlpha, isLetter )
 import qualified Data.Map as M
 import Distribution.Verbosity (normal)
 import Control.Monad (when)
+
+simplifyExponents :: [(Char,Int)] -> [(Char,Int)] -- simplifies exponents of variables e.g [('x',2),('x',1)] = [('x',3)]
+simplifyExponents xs = [(a, sum b) | (a,b) <- M.toList (M.fromListWith (\n1 n2 -> n1 ++ n2) [(a,[b]) | (a,b) <- xs])]
+
 polynomialCleaner :: String -> String
 polynomialCleaner [] = []
 polynomialCleaner (x:xs)
@@ -34,12 +38,12 @@ internalRepresentation :: String -> (Int,[(Char,Int)])
 internalRepresentation xs
     | all isDigit xs = (read xs, [])
     | head xs == '-' && all isDigit (tail xs) = (-read (tail xs), [])
-    | all isLetter xs = (1, [(char,1)| char <- xs])
-    | head xs == '-' && all isLetter (tail xs) = (-1, [(char,1)| char <- tail xs])
-    | head xs == '-' && not (isDigit (xs !! 1)) = (-1, [tuples | tuples <- exponentProcessor (filter (/='^') (tail xs))])
-    | head xs == '-' = (negDigit, [tuples | tuples <- exponentProcessor (filter (/='^') (dropWhile isDigit(tail xs)))])
-    |not (isDigit (head xs)) = (1, [tuples | tuples <- exponentProcessor (filter (/='^') (dropWhile isDigit xs))])
-    |otherwise = (digit, [tuples | tuples <- exponentProcessor (filter (/='^') (dropWhile isDigit xs))])
+    | all isLetter xs = (1, simplifyExponents [(char,1)| char <- xs])
+    | head xs == '-' && all isLetter (tail xs) = (-1, simplifyExponents [(char,1)| char <- tail xs])
+    | head xs == '-' && not (isDigit (xs !! 1)) = (-1, simplifyExponents [tuples | tuples <- exponentProcessor (filter (/='^') (tail xs))])
+    | head xs == '-' = (negDigit, simplifyExponents[tuples | tuples <- exponentProcessor (filter (/='^') (dropWhile isDigit(tail xs)))])
+    |not (isDigit (head xs)) = (1, simplifyExponents [tuples | tuples <- exponentProcessor (filter (/='^') (dropWhile isDigit xs))])
+    |otherwise = (digit, simplifyExponents [tuples | tuples <- exponentProcessor (filter (/='^') (dropWhile isDigit xs))])
     where
         digit = read (takeWhile isDigit xs) :: Int
         negDigit = - read (takeWhile isDigit (tail xs)) :: Int
@@ -75,15 +79,17 @@ normalize poly = joiner (tplToString (simply (sorting [internalRepresentation x 
 add :: String -> String -> String -- main function to run option b (add 2 polynomials)
 add poly1 poly2 = normalize (poly1 ++ "+" ++ poly2)
 
+
 multiplyVars :: [(Char,Int)] -> [(Char,Int)] -> [(Char,Int)] -- multiplies variables of a 2 monomials
 multiplyVars x y = x ++ y
 
 multiplyOne :: (Int,[(Char,Int)]) -> (Int,[(Char,Int)]) -> (Int,[(Char,Int)]) -- multiplies two monomials by themselves
-multiplyOne (a,b) (c,d) = (a*c, multiplyVars b d)
+multiplyOne (a,b) (c,d) = (a*c, simplifyExponents(multiplyVars b d))
 
 multiply :: [(Int,[(Char,Int)])] -> [(Int,[(Char,Int)])] -> [(Int,[(Char,Int)])] -- multiplies 2 polynomials by one another
 multiply [] _ = []
 multiply (x:xs) ys = [multiplyOne x y | y<- ys] ++ multiply xs ys
+
 
 multiplication :: String -> String -> String -- main function to run option c
 multiplication poly1 poly2 = joiner(tplToString (simply (sorting (multiply [internalRepresentation x | x <- polynomialOrganizer poly1] [internalRepresentation x | x <- polynomialOrganizer poly2]))))
