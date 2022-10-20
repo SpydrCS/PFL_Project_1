@@ -1,5 +1,3 @@
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
-{-# HLINT ignore "Use :" #-}
 import Data.Char ( isDigit, isAlpha, isLetter )
 import qualified Data.Map as M
 import Distribution.Verbosity (normal)
@@ -70,11 +68,8 @@ tplToString xs = [(show b) ++ "*" ++ (simpVar a) | (a,b) <- xs, b /= 1, a /= []]
 joiner :: [String] -> String -- joins list of strings into one string
 joiner xs = foldr (\a b-> a ++ if b=="" then b else if (head b)=='-' then " - " ++ (drop 1 b) else " + " ++ b) "" xs
 
-iR :: String -> [String] -- Internal Representation of the polynomial e.g (2,[(x,2),(y,1)]) = x^2y
-iR xs = tplToString (simply (sorting [internalRepresentation x | x <- polynomialOrganizer xs]))
-
 normalize :: String -> String -- main function to run option a (normalize polynomial)
-normalize poly = joiner (tplToString (simply (sorting [internalRepresentation x | x <- polynomialOrganizer poly])))
+normalize poly = joiner (tplToString (simply (sorting [internalRepresentation x | x <- polynomialOrganizer poly, head x /= '0'])))
 
 add :: String -> String -> String -- main function to run option b (add 2 polynomials)
 add poly1 poly2 = normalize (poly1 ++ "+" ++ poly2)
@@ -92,7 +87,7 @@ multiply (x:xs) ys = [multiplyOne x y | y<- ys] ++ multiply xs ys
 
 
 multiplication :: String -> String -> String -- main function to run option c
-multiplication poly1 poly2 = joiner(tplToString (simply (sorting (multiply [internalRepresentation x | x <- polynomialOrganizer poly1] [internalRepresentation x | x <- polynomialOrganizer poly2]))))
+multiplication poly1 poly2 = joiner(tplToString (simply (sorting (multiply [internalRepresentation x | x <- polynomialOrganizer poly1, head x /= '0'] [internalRepresentation x | x <- polynomialOrganizer poly2, head x /= '0']))))
 
 reducer :: [(Char,Int)] -> Char -> [(Char,Int)] -- reduces exponent of variable to be derived e.g [('y',1),('x',2)] 'x' = [('y',1),('x',1)]
 reducer xs vari = [(a,b) | (a,b) <- xs, a /= vari] ++ [(a,b-1) | (a,b) <- xs, a==vari, b>1]
@@ -108,5 +103,42 @@ changer :: [(Int,[(Char,Int)])] -> Char -> [(Int,[(Char,Int)])] -- changes inter
 changer xs vari = [(a*(coeficient b vari),reducer b vari) | (a,b) <- xs, a*(coeficient b vari)/=0] -- e.g [(1,[('y',1),('x',1)]),(2,[('x',1),('y',2)])] 'y' = [(1,[('x',1)]),(4,[('x',1),('y',1)])]
 
 derivative :: String -> Char -> String -- main function to run option d
-derivative poly vari | joiner (tplToString (simply (sorting (changer [internalRepresentation x | x <- polynomialOrganizer poly] vari)))) /= "" = joiner (tplToString (simply (sorting (changer [internalRepresentation x | x <- polynomialOrganizer poly] vari))))
+derivative poly vari | joiner (tplToString (simply (sorting (changer [internalRepresentation x | x <- polynomialOrganizer poly, head x /= '0'] vari)))) /= "" = joiner (tplToString (simply (sorting (changer [internalRepresentation x | x <- polynomialOrganizer poly] vari))))
                      | otherwise = "0"
+
+main :: IO()
+main = do
+            putStrLn "What do you want to do? Normalize (1), Add (2), Multiply (3), or Differentiate (4)?"
+            str <- getLine
+            let option = read str :: Int
+            if option == 1
+               then do putStrLn "What is the polynomial you want to normalize?" 
+                       poly <- getLine
+                       putStrLn("\n" ++(normalize poly))
+                       putStrLn "\n"
+               else return ()
+            if option == 2
+               then do putStrLn "What is the first polynomial you want to add?"
+                       poly1 <- getLine
+                       putStrLn "What is the second polynomial you want to add?"
+                       poly2 <- getLine
+                       putStrLn("\n" ++(add poly1 poly2))
+                       putStrLn "\n"
+               else return ()
+            if option == 3
+               then do putStrLn "What is the first polynomial you want to multiply?"
+                       poly1 <- getLine
+                       putStrLn "What is the second polynomial you want to multiply?"
+                       poly2 <- getLine
+                       putStrLn("\n" ++(multiplication poly1 poly2))
+                       putStrLn "\n"
+               else return ()
+            if option == 4
+               then do putStrLn "What is the polynomial you want to differentiate, and by what variable (if you want to differentiate by x, for example, type x, if it is by k, y, or anything, type whatever the variable is)?"
+                       putStrLn "The polynomial, then space, then variable you want to differentiate by (If you want to derive by x use *.) e.g x^2+2xy  x"
+                       poly <- getLine
+                       let var1 = words poly --e.g "what*is*exactly*going*on"
+                       putStrLn("\n" ++(derivative (head var1) (var1!!1 !! 0))) 
+                       putStrLn "\n"
+            else main
+
