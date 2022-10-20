@@ -44,6 +44,17 @@ internalRepresentation xs
         digit = read (takeWhile isDigit xs) :: Int
         negDigit = - read (takeWhile isDigit (tail xs)) :: Int
 
+
+polynomialGrade :: String -> Int
+polynomialGrade xs = maximum [snd x | x <- snd (internalRepresentation xs)]
+
+polynomialGreaterThan :: String -> String -> Bool
+polynomialGreaterThan xs ys = polynomialGrade xs > polynomialGrade ys
+
+polynomialSorter :: [String] -> [String]
+polynomialSorter [] = []
+polynomialSorter (x:xs) = polynomialSorter [y | y <- xs, polynomialGreaterThan y x] ++ [x] ++ polynomialSorter [y | y <- xs, not (polynomialGreaterThan y x)]
+
 sorting :: [(Int,[(Char,Int)])] -> [([(Char,Int)],[Int])]  -- takes the list with all variables (some repeated) and groups them without repetition
 sorting assocs = M.toList (M.fromListWith (\n1 n2 -> [sum(n1 ++ n2)]) [((b), [a]) | (a,b) <- assocs]) -- [(1,('y',1)),(2,('y',1))] becomes [(('y',1),[3])], etc
 
@@ -67,7 +78,7 @@ joiner :: [String] -> String -- joins list of strings into one string
 joiner xs = foldr (\a b-> a ++ if b=="" then b else if (head b)=='-' then " - " ++ (drop 1 b) else " + " ++ b) "" xs
 
 normalize :: String -> String -- main function to run option a (normalize polynomial)
-normalize poly = joiner (tplToString (simply (sorting [internalRepresentation x | x <- polynomialOrganizer poly, head x /= '0'])))
+normalize poly = joiner (polynomialSorter (tplToString (simply (sorting [internalRepresentation x | x <- polynomialOrganizer poly, head x /= '0']))))
 
 add :: String -> String -> String -- main function to run option b (add 2 polynomials)
 add poly1 poly2 = normalize (poly1 ++ "+" ++ poly2)
@@ -85,7 +96,7 @@ multiply (x:xs) ys = [multiplyOne x y | y<- ys] ++ multiply xs ys
 
 
 multiplication :: String -> String -> String -- main function to run option c
-multiplication poly1 poly2 = joiner(tplToString (simply (sorting (multiply [internalRepresentation x | x <- polynomialOrganizer poly1, head x /= '0'] [internalRepresentation x | x <- polynomialOrganizer poly2, head x /= '0']))))
+multiplication poly1 poly2 = joiner(polynomialSorter (tplToString (simply (sorting (multiply [internalRepresentation x | x <- polynomialOrganizer poly1, head x /= '0'] [internalRepresentation x | x <- polynomialOrganizer poly2, head x /= '0'])))))
 
 reducer :: [(Char,Int)] -> Char -> [(Char,Int)] -- reduces exponent of variable to be derived e.g [('y',1),('x',2)] 'x' = [('y',1),('x',1)]
 reducer xs vari = [(a,b) | (a,b) <- xs, a /= vari] ++ [(a,b-1) | (a,b) <- xs, a==vari, b>1]
@@ -101,7 +112,7 @@ changer :: [(Int,[(Char,Int)])] -> Char -> [(Int,[(Char,Int)])] -- changes inter
 changer xs vari = [(a*(coeficient b vari),reducer b vari) | (a,b) <- xs, a*(coeficient b vari)/=0] -- e.g [(1,[('y',1),('x',1)]),(2,[('x',1),('y',2)])] 'y' = [(1,[('x',1)]),(4,[('x',1),('y',1)])]
 
 derivative :: String -> Char -> String -- main function to run option d
-derivative poly vari | joiner (tplToString (simply (sorting (changer [internalRepresentation x | x <- polynomialOrganizer poly, head x /= '0'] vari)))) /= "" = joiner (tplToString (simply (sorting (changer [internalRepresentation x | x <- polynomialOrganizer poly] vari))))
+derivative poly vari | joiner (polynomialSorter (tplToString (simply (sorting (changer [internalRepresentation x | x <- polynomialOrganizer poly, head x /= '0'] vari))))) /= "" = joiner (polynomialSorter (tplToString (simply (sorting (changer [internalRepresentation x | x <- polynomialOrganizer poly] vari)))))
                      | otherwise = "0"
 
 main :: IO()
