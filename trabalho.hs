@@ -1,9 +1,6 @@
 import Data.Char ( isDigit, isAlpha, isLetter )
 import qualified Data.Map as M
 
-simplifyExponents :: [(Char,Int)] -> [(Char,Int)] -- simplifies exponents of variables e.g [('x',2),('x',1)] = [('x',3)]
-simplifyExponents xs = [(a, sum b) | (a,b) <- M.toList (M.fromListWith (\n1 n2 -> n1 ++ n2) [(a,[b]) | (a,b) <- xs])]
-
 polynomialCleaner :: String -> String
 polynomialCleaner [] = []
 polynomialCleaner (x:xs)
@@ -82,6 +79,9 @@ normalize poly = joiner (polynomialSorter (tplToString (simply (sorting [interna
 
 add :: String -> String -> String -- main function to run option b (add 2 polynomials)
 add poly1 poly2 = normalize (poly1 ++ "+" ++ poly2)
+
+simplifyExponents :: [(Char,Int)] -> [(Char,Int)] -- simplifies exponents of variables e.g [('x',2),('x',1)] = [('x',3)]
+simplifyExponents xs = [(a, sum b) | (a,b) <- M.toList (M.fromListWith (\n1 n2 -> n1 ++ n2) [(a,[b]) | (a,b) <- xs])]
 
 
 multiplyVars :: [(Char,Int)] -> [(Char,Int)] -> [(Char,Int)] -- multiplies variables of a 2 monomials
