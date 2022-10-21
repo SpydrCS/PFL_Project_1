@@ -62,7 +62,7 @@ We will then be provided with this menu:
   <img src="https://i.imgur.com/qscYOw9.png"/>
 </p>
 You should then insert 1,2,3 or 4 and press Enter.
-If you choose 1, you will write down the polynomial you want to normalize (inside "") and press Enter.
-If you choose 2, you will write down the first polynomial you want to add (inside ""), press Enter, write down the second polynomial you want to add (inside "") and press Enter once again.
-If you choose 3, you will write down the first polynomial you want to multiply (inside ""), press Enter, write down the second polynomial you want to multiply (inside "") and press Enter once again.
-If you choose 4, you will write down the polynomial you want to derive (inside "") and press Enter.
+- If you choose 1, you will write down the polynomial you want to normalize (inside "") and press Enter.
+- If you choose 2, you will write down the first polynomial you want to add (inside ""), press Enter, write down the second polynomial you want to add (inside "") and press Enter once again.
+- If you choose 3, you will write down the first polynomial you want to multiply (inside ""), press Enter, write down the second polynomial you want to multiply (inside "") and press Enter once again.
+- If you choose 4, you will write down the polynomial you want to derive (inside "") and press Enter.
