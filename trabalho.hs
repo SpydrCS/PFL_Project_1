@@ -31,12 +31,12 @@ internalRepresentation :: String -> (Int,[(Char,Int)])
 internalRepresentation xs
     | all isDigit xs = (read xs, [])
     | head xs == '-' && all isDigit (tail xs) = (-read (tail xs), [])
-    | all isLetter xs = (1, simplifyExponents [(char,1)| char <- xs])
-    | head xs == '-' && all isLetter (tail xs) = (-1, simplifyExponents [(char,1)| char <- tail xs])
-    | head xs == '-' && not (isDigit (xs !! 1)) = (-1, simplifyExponents [tuples | tuples <- exponentProcessor (filter (/='^') (tail xs))])
-    | head xs == '-' = (negDigit, simplifyExponents[tuples | tuples <- exponentProcessor (filter (/='^') (dropWhile isDigit(tail xs)))])
-    |not (isDigit (head xs)) = (1, simplifyExponents [tuples | tuples <- exponentProcessor (filter (/='^') (dropWhile isDigit xs))])
-    |otherwise = (digit, simplifyExponents [tuples | tuples <- exponentProcessor (filter (/='^') (dropWhile isDigit xs))])
+    | all isLetter xs = (1, simplifyexponents [(char,1)| char <- xs])
+    | head xs == '-' && all isLetter (tail xs) = (-1, simplifyexponents [(char,1)| char <- tail xs])
+    | head xs == '-' && not (isDigit (xs !! 1)) = (-1, simplifyexponents [tuples | tuples <- exponentProcessor (filter (/='^') (tail xs))])
+    | head xs == '-' = (negDigit, simplifyexponents[tuples | tuples <- exponentProcessor (filter (/='^') (dropWhile isDigit(tail xs)))])
+    |not (isDigit (head xs)) = (1, simplifyexponents [tuples | tuples <- exponentProcessor (filter (/='^') (dropWhile isDigit xs))])
+    |otherwise = (digit, simplifyexponents [tuples | tuples <- exponentProcessor (filter (/='^') (dropWhile isDigit xs))])
     where
         digit = read (takeWhile isDigit xs) :: Int
         negDigit = - read (takeWhile isDigit (tail xs)) :: Int
@@ -54,7 +54,6 @@ polynomialSorter (x:xs) = polynomialSorter [y | y <- xs, polynomialGreaterThan y
 
 sorting :: [(Int,[(Char,Int)])] -> [([(Char,Int)],[Int])]  -- takes the list with all variables (some repeated) and groups them without repetition
 sorting assocs = M.toList (M.fromListWith (\n1 n2 -> [sum(n1 ++ n2)]) [((b), [a]) | (a,b) <- assocs]) -- [(1,('y',1)),(2,('y',1))] becomes [(('y',1),[3])], etc
-
 
 simply :: [([(Char,Int)],[Int])] -> [([(Char,Int)],Int)] -- changes count number from list to normal int
 simply xs = [(a,b) | ((a,[b])) <- xs]
@@ -80,15 +79,15 @@ normalize poly = joiner (polynomialSorter (tplToString (simply (sorting [interna
 add :: String -> String -> String -- main function to run option b (add 2 polynomials)
 add poly1 poly2 = normalize (poly1 ++ "+" ++ poly2)
 
-simplifyExponents :: [(Char,Int)] -> [(Char,Int)] -- simplifies exponents of variables e.g [('x',2),('x',1)] = [('x',3)]
-simplifyExponents xs = [(a, sum b) | (a,b) <- M.toList (M.fromListWith (\n1 n2 -> n1 ++ n2) [(a,[b]) | (a,b) <- xs])]
+simplifyexponents :: [(Char,Int)] -> [(Char,Int)] -- simplifies exponents of variables e.g [('x',2),('x',1)] = [('x',3)]
+simplifyexponents xs = [(a, sum b) | (a,b) <- M.toList (M.fromListWith (\n1 n2 -> n1 ++ n2) [(a,[b]) | (a,b) <- xs])]
 
 
 multiplyVars :: [(Char,Int)] -> [(Char,Int)] -> [(Char,Int)] -- multiplies variables of a 2 monomials
 multiplyVars x y = x ++ y
 
 multiplyOne :: (Int,[(Char,Int)]) -> (Int,[(Char,Int)]) -> (Int,[(Char,Int)]) -- multiplies two monomials by themselves
-multiplyOne (a,b) (c,d) = (a*c, simplifyExponents(multiplyVars b d))
+multiplyOne (a,b) (c,d) = (a*c, simplifyexponents(multiplyVars b d))
 
 multiply :: [(Int,[(Char,Int)])] -> [(Int,[(Char,Int)])] -> [(Int,[(Char,Int)])] -- multiplies 2 polynomials by one another
 multiply [] _ = []
@@ -105,11 +104,11 @@ maybeHead :: [Int] -> Int -- in case list is empty, return "1", otherwise return
 maybeHead [] = 0
 maybeHead xs = head xs
 
-coeficient :: [(Char,Int)] -> Char -> Int -- finds coeficient of variable to be derived e.g [('y',1),('x',2)] 'x' = 2
-coeficient xs vari = maybeHead [b | (a,b) <- xs, a==vari]
+exponentt :: [(Char,Int)] -> Char -> Int -- finds exponent of variable to be derived e.g [('y',1),('x',2)] 'x' = 2
+exponentt xs vari = maybeHead [b | (a,b) <- xs, a==vari]
 
 changer :: [(Int,[(Char,Int)])] -> Char -> [(Int,[(Char,Int)])] -- changes internal tuples to be derived by the variable chosen
-changer xs vari = [(a*(coeficient b vari),reducer b vari) | (a,b) <- xs, a*(coeficient b vari)/=0] -- e.g [(1,[('y',1),('x',1)]),(2,[('x',1),('y',2)])] 'y' = [(1,[('x',1)]),(4,[('x',1),('y',1)])]
+changer xs vari = [(a*(exponentt b vari),reducer b vari) | (a,b) <- xs, a*(exponentt b vari)/=0] -- e.g [(1,[('y',1),('x',1)]),(2,[('x',1),('y',2)])] 'y' = [(1,[('x',1)]),(4,[('x',1),('y',1)])]
 
 derivative :: String -> Char -> String -- main function to run option d
 derivative poly vari | joiner (polynomialSorter (tplToString (simply (sorting (changer [internalRepresentation x | x <- polynomialOrganizer poly, head x /= '0'] vari))))) /= "" = joiner (polynomialSorter (tplToString (simply (sorting (changer [internalRepresentation x | x <- polynomialOrganizer poly] vari)))))
@@ -121,7 +120,7 @@ main = do
             str <- getLine
             let option = read str :: Int
             if option == 1
-               then do putStrLn "What is the polynomial you want to normalize?" 
+               then do putStrLn "What is the polynomial you want to normalize?"
                        poly <- getLine
                        putStrLn("\n" ++(normalize poly))
                        putStrLn "\n"
@@ -147,7 +146,6 @@ main = do
                        putStrLn "The polynomial, then space, then variable you want to differentiate by (If you want to derive by x use *.) e.g x^2+2xy  x"
                        poly <- getLine
                        let var1 = words poly --e.g "what*is*exactly*going*on"
-                       putStrLn("\n" ++(derivative (head var1) (var1!!1 !! 0))) 
+                       putStrLn("\n" ++(derivative (head var1) (var1!!1 !! 0)))
                        putStrLn "\n"
             else main
-
