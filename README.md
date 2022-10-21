@@ -51,8 +51,8 @@ Starting off with the special case, this will happen if the string given to be d
 Moving on to the main part of the function:
 We start off the same way as the normalization, separating the string into a list of monomials in the internal representation form.
 From there, we use a function called **changer** which has the objective of changing the internal representation from the monomials to the internal representation of those same monomials after being derived. 
-To do that, we use two functions inside a list comprehension: **exponent** and **reducer**.
-The **exponent** function is used to find the exponent of the variable to be derived (e.g coefficient x^2 = 2).
+To do that, we use two functions inside a list comprehension: **exponentt** and **reducer**.
+The **exponentt** function is used to find the exponent of the variable to be derived (e.g coefficient x^2 = 2).
 The **reducer** function is used to reduce the exponent of monomials that have the variable to be derived and multiply it by the coefficient of the monomial.
 After that, the same happens as it does in the **normalize** function, we add monomials with the same set of variables, convert it from a list of internal representation to a list of strings and then concatenate them all together, to have the final result as a single string.
 The function that adds all of these functions together is called **derivative**.
