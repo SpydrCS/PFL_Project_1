@@ -27,11 +27,13 @@ Then, we call a function to add all the coefficients of monomials with the same 
 Next, we get to the part of reverting the polynomial from the internal representation form to a string. For this, we use a function for each of the monomials in a list which will convert them from an internal representation to a string representation. This function is called **tplToString**.
 After that, we use a function called **polynomialSorter** to sort our list of monomials by their degree.
 Finally, we use a function called **joiner** to join all the monomials from the list of strings into a single string, to be outputted in a way the user can understand.
+The function that adds all of these functions together is called **normalize**.
 
 ## Addition
 
 The addition of two polynomials is done in the exact same way as the normalization, except for the first step.
 After the user provides the two polynomials to be added, we concatenate the two strings, with a '+' in the middle of them. After that, we just call the **normalize** function and it will provide de addition of both polynomials.
+The function that adds all of these functions together is called **add**.
 
 ## Multiplication
 
@@ -40,6 +42,7 @@ First, we use a function capable of multiplying a list of variables by a list of
 Second, we use a function capable of multiplying a monomial by another monomial which is done by multiplying the coefficients and multiplying the variables, using the multiplyVars function. This function is called **multiplyOne**.
 Finally, we use a function capable of multiplying a polynomial by another polynomial, which is done by multiplying each monomial of the first polynomial by each monomial of the second polynomial, using the multiplyOne function. This function is called **multiply**.
 After that, we simply transform the internal representation of the polynomial into a string with the function multiplication.
+The function that adds all of these functions together is called **multiplication**.
 
 ## Derivation
 
@@ -52,6 +55,7 @@ To do that, we use two functions inside a list comprehension: **exponent** and *
 The **exponent** function is used to find the exponent of the variable to be derived (e.g coefficient x^2 = 2).
 The **reducer** function is used to reduce the exponent of monomials that have the variable to be derived and multiply it by the coefficient of the monomial.
 After that, the same happens as it does in the **normalize** function, we add monomials with the same set of variables, convert it from a list of internal representation to a list of strings and then concatenate them all together, to have the final result as a single string.
+The function that adds all of these functions together is called **derivative**.
 
 ## Examples of use
 
