@@ -30,8 +30,8 @@ We chose this representation because it was the most intuitive and easy to imple
 The normalization of a polynomial is done in 6 important steps:
 Firstly, we use a function to remove all unwanted characters (in this case, spaces and '*') and insert each monomial into a list. This function is called **polynomialOrganizer**.
 After that, we use a function to convert a list of monomials into the internal representation we use. This function is called **internalRepresentation**.
-Next, we use a function called **polynomialSorter** to sort our the polynomial by their degree.
 Then, we call a function to add all the coefficients of monomials with the same set of variables. This function is called **sorting**.
+Next, we use a function called **polynomialSorter** to sort our the polynomial by their degree.
 Next, we get to the part of reverting the polynomial from the internal representation form to a string. For this, we use a function for each of the monomials in a list which will convert them from an internal representation to a string representation. This function is called **tplToString**.
 Finally, we use a function called **joiner** to join all the monomials from the list of strings into a single string, to be outputted in a way the user can understand.
 The function that adds all of these functions together is called **normalize**.
@@ -83,4 +83,4 @@ You should then insert 1, 2, 3 or 4 and press Enter.
 - If you choose 1, you will write down the polynomial you want to normalize and press Enter. (e.g. 2xy *Enter*)
 - If you choose 2, you will write down the first polynomial you want to add, press Enter, write down the second polynomial you want to add and press Enter once again. (e.g. 2xy *Enter* 2xy *Enter*)
 - If you choose 3, you will write down the first polynomial you want to multiply, press Enter, write down the second polynomial you want to multiply and press Enter once again. (e.g. 2xy *Enter* 2xy *Enter*)
-- If you choose 4, you will write down the polynomial you want to derive, a space and the variable you want to differentiate by, then press Enter. (e.g. 2xy x)
+- If you choose 4, you will write down the polynomial you want to derive, a space and the variable you want to differentiate by, then press Enter. **The polynomial you want to derive must be typed without any spaces otherwise the function won't work as it's supposed to** (e.g. 2xy x)
