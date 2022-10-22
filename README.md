@@ -1,9 +1,13 @@
 # PFL_TP1
+
 ## Polynomial Manipulation
+
 Developed by:
 - Rui Pires up202008252@up.pt
 - Guilherme Moreira up202007036@up.pt
+
 <br>
+
 ### Description
 This project consists of a program that manipulates polynomials. The program is able to read polynomials via user input and perform operations on them. The operations that can be performed are:
 - Normalization
@@ -11,13 +15,16 @@ This project consists of a program that manipulates polynomials. The program is 
 - Multiplication
 - Derivation
 <br>
+
 ## Internal Representation
+
 We chose a representation of polynomials as a list of tuples, where each tuple is a pair of the form (coefficient,list of exponents). The list of exponents is a list of tuples, where each tuple is a pair of the form (variable,exponent). So to sum it up the internal representation is a list of tuples of the form (coefficient,list of tuples of the form (variable,exponent)). For example, the polynomial 2xy^2 + 3x^2y^3 would be represented as:
 ```
 [(2,[(x,1),(y,2)]),(3,[(x,2),(y,3)])]
 ```
 We chose this representation because it was the most intuitive and easy to implement. It also allows for easy manipulation of the polynomials, since we can easily add, multiply, normalize and derive them.
 <br>
+
 ## Normalization
 
 The normalization of a polynomial is done in 6 important steps:
@@ -28,13 +35,16 @@ Then, we call a function to add all the coefficients of monomials with the same 
 Next, we get to the part of reverting the polynomial from the internal representation form to a string. For this, we use a function for each of the monomials in a list which will convert them from an internal representation to a string representation. This function is called **tplToString**.
 Finally, we use a function called **joiner** to join all the monomials from the list of strings into a single string, to be outputted in a way the user can understand.
 The function that adds all of these functions together is called **normalize**.
+
 <br>
+
 ## Addition
 
 The addition of two polynomials is done in the exact same way as the normalization, except for the first step.
 After the user provides the two polynomials to be added, we concatenate the two strings, with a '+' in the middle of them. After that, we just call the **normalize** function and it will provide de addition of both polynomials.
 The function that adds all of these functions together is called **add**.
 <br>
+
 ## Multiplication
 
 The multiplication of two polynomials is done in 3 important steps:
