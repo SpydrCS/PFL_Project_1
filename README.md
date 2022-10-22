@@ -23,9 +23,9 @@ We chose this representation because it was the most intuitive and easy to imple
 The normalization of a polynomial is done in 6 important steps:
 Firstly, we use a function to remove all unwanted characters (in this case, spaces and '*') and insert each monomial into a list. This function is called **polynomialOrganizer**.
 After that, we use a function to convert a list of monomials into the internal representation we use. This function is called **internalRepresentation**.
+Next, we use a function called **polynomialSorter** to sort our the polynomial by their degree.
 Then, we call a function to add all the coefficients of monomials with the same set of variables. This function is called **sorting**.
 Next, we get to the part of reverting the polynomial from the internal representation form to a string. For this, we use a function for each of the monomials in a list which will convert them from an internal representation to a string representation. This function is called **tplToString**.
-After that, we use a function called **polynomialSorter** to sort our list of monomials by their degree.
 Finally, we use a function called **joiner** to join all the monomials from the list of strings into a single string, to be outputted in a way the user can understand.
 The function that adds all of these functions together is called **normalize**.
 
@@ -40,7 +40,7 @@ The function that adds all of these functions together is called **add**.
 The multiplication of two polynomials is done in 3 important steps:
 First, we use a function capable of multiplying a list of variables by a list of variables, which is done by appending the variables of the second list to the first one. This function is called **multiplyVars**.
 Second, we use a function capable of multiplying a monomial by another monomial which is done by multiplying the coefficients and multiplying the variables, using the multiplyVars function. This function is called **multiplyOne**.
-Finally, we use a function capable of multiplying a polynomial by another polynomial, which is done by multiplying each monomial of the first polynomial by each monomial of the second polynomial, using the multiplyOne function. This function is called **multiply**.
+Finally, we use a function capable of multiplying a polynomial by another polynomial, which is done by multiplying each monomial of the first polynomial by each monomial of the second polynomial, using the multiplyOne function. This function is called **multiply**. We use a function called **simplifyExponents** to simplify the exponents of the variables in the polynomial (e.g. 2x^2x^3 = 2x^5).
 After that, we simply transform the internal representation of the polynomial into a string with the function multiplication.
 The function that adds all of these functions together is called **multiplication**.
 
