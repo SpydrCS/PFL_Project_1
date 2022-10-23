@@ -118,7 +118,7 @@ derivative poly vari | joiner (tplToString (polynomialSorter(simply (sorting (ch
 
 main :: IO() -- main menu to choose what option you want to run
 main = do
-            putStrLn "What do you want to do? Normalize (1), Add (2), Multiply (3), or Differentiate (4)?"
+            putStrLn "What do you want to do? Normalize (1), Add (2), Multiply (3), Differentiate (4) or Exit (5)?"
             str <- getLine
             let option = read str :: Int
             if option == 1
@@ -144,10 +144,13 @@ main = do
                        putStrLn "\n"
                else return ()
             if option == 4
-               then do putStrLn "What is the polynomial you want to differentiate, and by what variable (if you want to differentiate by x, for example, type x, if it is by k, y, or anything, type whatever the variable is)?"
-                       putStrLn "The polynomial, then space, then variable you want to differentiate by (If you want to derive by x use *.) e.g x^2+2xy  x"
+               then do putStrLn "What is the polynomial you want to differentiate?"
                        poly <- getLine
-                       let var1 = words poly --e.g "what*is*exactly*going*on"
-                       putStrLn("\n" ++(derivative (head var1) (var1!!1 !! 0)))
+                       putStrLn "What is the variable you want to differentiate by?"
+                       vari <- getLine
+                       putStrLn("\n" ++(derivative poly (head vari)))
                        putStrLn "\n"
+                else return ()
+            if option == 5
+               then do putStrLn "Goodbye!"
             else main

@@ -83,4 +83,4 @@ You should then insert 1, 2, 3 or 4 and press Enter.
 - If you choose 1, you will write down the polynomial you want to normalize and press Enter. (e.g. 2xy *Enter*)
 - If you choose 2, you will write down the first polynomial you want to add, press Enter, write down the second polynomial you want to add and press Enter once again. (e.g. 2xy *Enter* 2xy *Enter*)
 - If you choose 3, you will write down the first polynomial you want to multiply, press Enter, write down the second polynomial you want to multiply and press Enter once again. (e.g. 2xy *Enter* 2xy *Enter*)
-- If you choose 4, you will write down the polynomial you want to derive, a space and the variable you want to differentiate by, then press Enter. **The polynomial you want to derive must be typed without any spaces otherwise the function won't work as it's supposed to** (e.g. 2xy x)
+- If you choose 4, you will write down the polynomial you want to derive, press enter and then write down the variable you want to derive. (e.g. 2xy *Enter* x *Enter*)
