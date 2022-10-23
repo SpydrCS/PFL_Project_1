@@ -84,3 +84,37 @@ You should then insert 1, 2, 3 or 4 and press Enter.
 - If you choose 2, you will write down the first polynomial you want to add, press Enter, write down the second polynomial you want to add and press Enter once again. (e.g. 2xy *Enter* 2xy *Enter*)
 - If you choose 3, you will write down the first polynomial you want to multiply, press Enter, write down the second polynomial you want to multiply and press Enter once again. (e.g. 2xy *Enter* 2xy *Enter*)
 - If you choose 4, you will write down the polynomial you want to derive, press enter and then write down the variable you want to derive. (e.g. 2xy *Enter* x *Enter*)
+
+## Test Cases
+
+### Normalization
+
+- 2xy *Enter* -> ````2*x*y````
+- 2xy + 3x^2y^3 *Enter* -> ````3*x^2*y^3 + 2*x*y````
+- 2xy + 3x^2y^3 + 2xy + 3x^2y^3 *Enter* -> ````6*x^2*y^3 + 4*x*y````
+- 2xy + 2yx *Enter* -> ````4*x*y````
+- 0x^2 + 2y + 5z + y + 7y^2 *Enter* -> ````7*y^2 + 3*y + 5*z````
+- -2 + 2 *Enter* -> ````0````
+
+### Addition
+
+- 2xy + 3x^2y^3 *Enter* + 2xy + 3x^2y^3 *Enter* -> ````6*x^2*y^3 + 4*x*y````
+- 4zx + 3zy *Enter* -2xz + 3y^2 *Enter* -> ````3*y^2 + 2*x*z + 3*y*z````
+
+**Addition is very similar to normalization, so the test cases don't need to be too extensive.**
+
+### Multiplication
+
+- 2xy *Enter* 2xy *Enter* -> ````4*x^2*y^2````
+- 2xy *Enter* 2xy + 3x^2y^3 *Enter* -> ````6*x^3*y^4 + 4*x^2*y^2````
+- 2x + 3y + 4z + 5v *Enter* 2r + 3s *Enter* -> ````10*r*v + 4*r*x + 6*r*y + 8*r*z + 15*s*v + 6*s*x + 9*s*y + 12*s*z````
+- -3x + 2y *Enter* 2x + 3y *Enter* -> ````-6*x^2 + 6y^2 -5*x*y````
+
+### Derivation
+
+- 2xy *Enter* x *Enter* -> ````2*y````
+- 2xy *Enter* y *Enter* -> ````2*x````
+- 2xy *Enter* z *Enter* -> ````0````
+- 2xy + 3x^2y^3 *Enter* x *Enter* -> ````6*y^3*x + 2*y````
+- -2 + 2 *Enter* x *Enter* -> ````0````
+- -4xz + 3xy - 5x^2z -2z^3 *Enter* z *Enter* -> ````-5*x^2 - 6*z^2 - 4*x````
